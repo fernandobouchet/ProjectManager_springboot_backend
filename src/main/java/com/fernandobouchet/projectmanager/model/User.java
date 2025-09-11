@@ -2,7 +2,9 @@ package com.fernandobouchet.projectmanager.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -27,14 +29,18 @@ public class User {
     @Column(nullable = false)
     private Date updatedAt;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Project> projects = new ArrayList<>();
+
     public User() {
     }
 
-    public User(String username, Long id, String email, String password, Date createdAt, Date updatedAt) {
+    public User(String username, Long id, String email, String password, List<Project> projects, Date createdAt, Date updatedAt) {
         this.username = username;
         this.id = id;
         this.email = email;
         this.password = password;
+        this.projects = projects;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -75,6 +81,14 @@ public class User {
         this.password = password;
     }
 
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -90,11 +104,12 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id='" + id + '\'' +
+                "email='" + email + '\'' +
                 ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
+                ", id=" + id +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", projects=" + projects +
                 '}';
     }
 

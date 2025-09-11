@@ -29,16 +29,22 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public Project() {
     }
 
-    public Project(long id, String title, Double progress, Date createdAt, Date updatedAt, List<Task> tasks) {
+    public Project(long id, String title, Double progress, Date createdAt, Date updatedAt, List<Task> tasks, User user) {
         this.id = id;
         this.title = title;
         this.progress = progress;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.tasks = tasks;
+        this.user = user;
     }
 
     public long getId() {
@@ -89,6 +95,14 @@ public class Project {
         this.tasks = tasks;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -99,6 +113,19 @@ public class Project {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", progress=" + progress +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", tasks=" + tasks +
+                ", user=" + user +
+                '}';
     }
 
     public void updateProgress() {
