@@ -1,8 +1,17 @@
 package com.fernandobouchet.projectmanager.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class ProjectCreateRequest {
-    private String title;
+
+    @NotNull(message = "User ID is mandatory")
     private Long userId;
+
+    @NotBlank(message = "Title is mandatory")
+    @Size(max=  100, message = "Title cant exceed 100 characters")
+    private String title;
 
     public ProjectCreateRequest() {
     }

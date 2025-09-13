@@ -3,11 +3,22 @@ package com.fernandobouchet.projectmanager.dto;
 import com.fernandobouchet.projectmanager.model.Priority;
 import com.fernandobouchet.projectmanager.model.Status;
 import com.fernandobouchet.projectmanager.model.Task;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class TaskUpdateRequest {
+
+    @NotBlank(message = "Project title is mandatory")
     private String title;
+
+    @NotBlank(message = "Project content is mandatory")
+    @Size(max = 500, message = "Content cannot exceed 500 characters")
     private String content;
+
+    @NotBlank(message = "Project status is mandatory")
     private Status status;
+
+    @NotBlank(message = "Project priority is mandatory")
     private Priority priority;
 
     public TaskUpdateRequest() {

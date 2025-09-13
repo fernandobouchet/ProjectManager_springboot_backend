@@ -1,6 +1,9 @@
 package com.fernandobouchet.projectmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.Date;
 import java.util.Objects;
@@ -12,28 +15,37 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Task title is mandatory")
+    @Size(max = 150, message = "Task title cannot exceed 150 characters")
+    @Column(nullable = false, length = 150)
     private String title;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Task content is mandatory")
+    @Size(max = 500, message = "Content cannot exceed 500 characters")
+    @Column(nullable = false, length = 500)
     private String content;
 
+    @NotNull(message = "Status is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.PENDING;
 
+    @NotNull(message = "Priority is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Priority priority = Priority.MEDIUM;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date createdAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date updatedAt;
 
+    @NotNull(message = "Project is mandatory")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     public Task() {

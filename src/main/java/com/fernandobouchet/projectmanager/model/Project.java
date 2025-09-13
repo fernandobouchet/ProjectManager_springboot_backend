@@ -1,6 +1,7 @@
 package com.fernandobouchet.projectmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,25 +13,33 @@ import java.util.Objects;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Title is mandatory")
+    @Size(max = 100, message = "Title cannot exceed 100 characters")
+    @Column(nullable = false, length = 100)
     private String title;
 
+    @NotNull(message = "Progress is mandatory")
+    @DecimalMin(value = "0.0", message = "Progress cannot be negative")
+    @DecimalMax(value = "100.0", message = "Progress cannot exceed 100")
     @Column(nullable = false)
     private Double progress = 0.0;
 
-    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
     private Date createdAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date updatedAt;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
+    @NotNull(message = "User is mandatory")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 
