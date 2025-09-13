@@ -2,6 +2,7 @@ package com.fernandobouchet.projectmanager.dto;
 
 import com.fernandobouchet.projectmanager.model.Priority;
 import com.fernandobouchet.projectmanager.model.Status;
+import com.fernandobouchet.projectmanager.model.Task;
 
 public class TaskUpdateRequest {
     private String title;
@@ -42,5 +43,15 @@ public class TaskUpdateRequest {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public Task toEntity() {
+        Task task = new Task();
+        task.setTitle(this.title);
+        task.setContent(this.content);
+        task.setStatus(this.status);
+        task.setPriority(this.priority);
+
+        return task;
     }
 }

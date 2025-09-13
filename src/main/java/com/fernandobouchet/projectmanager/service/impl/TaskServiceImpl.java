@@ -9,7 +9,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -38,28 +37,31 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskStatus(Long taskId, Status status) {
-        Task task = getTaskById(taskId);
+    public Task updateTask(Long taskId, Task task) {
+        Task taskToUpdate = getTaskById(taskId);
 
-        task.setStatus(status);
-        taskRepository.save(task);
+        if (task.getTitle() != null && !task.getTitle().equals(taskToUpdate.getTitle())) {
+            taskToUpdate.setTitle(task.getTitle());
+        }
+        if (task.getContent() != null && !task.getContent().equals(taskToUpdate.getContent())) {
+            taskToUpdate.setContent(task.getContent());
+        }
+        if (task.getStatus() != null && !task.getStatus().equals(taskToUpdate.getStatus())) {
+            taskToUpdate.setStatus(task.getStatus());
+        }
+        if (task.getPriority() != null && !task.getPriority().equals(taskToUpdate.getPriority())) {
+            taskToUpdate.setPriority(task.getPriority());
+        }
 
-        Project project = task.getProject();
+        taskRepository.save(taskToUpdate);
+
+        Project project = taskToUpdate.getProject();
         project.updateProgress();
         projectRepository.save(project);
-        
-        return task;
+
+        return taskToUpdate;
     }
 
-    @Override
-    public Task updateTaskPriority(Long taskId, Priority priority) {
-        Task task = getTaskById(taskId);
-
-        task.setPriority(priority);
-        taskRepository.save(task);
-
-        return task;
-    }
 
     @Override
     public List<Task> listTasksByProject(Long projectId) {

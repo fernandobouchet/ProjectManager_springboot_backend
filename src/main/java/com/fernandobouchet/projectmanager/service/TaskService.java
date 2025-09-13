@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface TaskService {
     Task createTask(Long projectId, String title, String content);
-    Task updateTaskStatus(Long taskId, Status status);
-    Task updateTaskPriority(Long taskId, Priority priority);
+    Task updateTask(Long taskId, Task task);
     List<Task> listTasksByProject(Long projectId);
     Task getTaskById(Long taskId);
     void deleteTask(Long taskId);
