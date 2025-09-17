@@ -5,6 +5,7 @@ import com.fernandobouchet.projectmanager.dto.TaskResponse;
 import com.fernandobouchet.projectmanager.dto.TaskUpdateRequest;
 import com.fernandobouchet.projectmanager.model.Task;
 import com.fernandobouchet.projectmanager.service.TaskService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,38 +19,40 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @PostMapping("/")
-    public TaskResponse createTask(@RequestBody TaskCreateRequest request) {
+    @PostMapping
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request) {
         Task task = taskService.createTask(request.getProjectId(), request.getTitle(), request.getContent());
 
-        return TaskResponse.fromEntity(task);
+        return ResponseEntity.ok(TaskResponse.fromEntity(task));
     }
 
     @GetMapping("/{taskId}")
-    public TaskResponse getTaskById(@PathVariable Long taskId) {
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long taskId) {
         Task task = taskService.getTaskById(taskId);
 
-        return TaskResponse.fromEntity(task);
+        return ResponseEntity.ok(TaskResponse.fromEntity(task));
     }
 
     @GetMapping("/project/{projectId}")
-    public List<TaskResponse> getTasksByProject(@PathVariable Long projectId) {
+    public ResponseEntity<List<TaskResponse>> getTasksByProject(@PathVariable Long projectId) {
         List<Task> tasks = taskService.listTasksByProject(projectId);
 
-        return TaskResponse.fromEntities(tasks);
+        return ResponseEntity.ok(TaskResponse.fromEntities(tasks));
     }
 
     @PutMapping("/{taskId}")
-    public TaskResponse updateTask(@PathVariable Long taskId, @RequestBody TaskUpdateRequest request) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long taskId, @RequestBody TaskUpdateRequest request) {
         Task task = request.toEntity();
 
         Task updatedTask = taskService.updateTask(taskId, task);
 
-        return TaskResponse.fromEntity(updatedTask);
+        return ResponseEntity.ok(TaskResponse.fromEntity(updatedTask));
     }
 
     @DeleteMapping("/{taskId}")
-    public void deleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId);
+
+        return ResponseEntity.noContent().build();
     }
 }

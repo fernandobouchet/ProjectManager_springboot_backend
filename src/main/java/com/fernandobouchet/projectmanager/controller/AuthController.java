@@ -6,6 +6,7 @@ import com.fernandobouchet.projectmanager.dto.UserResponse;
 import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.security.JwtUtil;
 import com.fernandobouchet.projectmanager.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -28,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public UserResponse registerUser(@RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserResponse> registerUser(@RequestBody UserRegisterRequest request) {
         User user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 
         UserResponse response = new UserResponse();
@@ -37,11 +38,11 @@ public class AuthController {
         response.setEmail(user.getEmail());
         response.setCreatedAt(user.getCreatedAt());
 
-       return response;
+       return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<String> loginUser(@RequestBody UserLoginRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -51,7 +52,7 @@ public class AuthController {
             );
 
             String token = jwtUtil.generateToken(request.getEmail());
-            return token;
+            return ResponseEntity.ok(token);
 
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid login credentials");
