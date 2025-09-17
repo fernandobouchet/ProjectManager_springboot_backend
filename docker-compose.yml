@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    container_name: projectmanager-db
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  app:
+    build: .
+    container_name: projectmanager-app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+
+volumes:
+  db_data:
+
+networks:
+  app-net:
