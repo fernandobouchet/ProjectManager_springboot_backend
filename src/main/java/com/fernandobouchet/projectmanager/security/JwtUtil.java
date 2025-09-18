@@ -33,6 +33,14 @@ public class JwtUtil {
                 .compact();
     }
 
+    public Long getUserIdFromHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String token = authHeader.replace("Bearer ", "");
+        return getUserIdFromToken(token);
+    }
+
     public Long getUserIdFromToken(String token) {
         Claims claims = parseClaims(token);
         return Long.parseLong(claims.getSubject());

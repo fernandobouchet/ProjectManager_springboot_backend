@@ -61,8 +61,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getMe(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+        Long userId = jwtUtil.getUserIdFromHeader(authHeader);
         User user = userService.getById(userId);
 
         UserResponse response = new UserResponse();
