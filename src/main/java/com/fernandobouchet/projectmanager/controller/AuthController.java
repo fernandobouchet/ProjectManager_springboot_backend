@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -51,11 +48,29 @@ public class AuthController {
                     )
             );
 
-            String token = jwtUtil.generateToken(request.getEmail());
+            User user = userService.getByEmail(request.getEmail());
+
+            String token = jwtUtil.generateToken(user.getId());
+
             return ResponseEntity.ok(token);
 
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid login credentials");
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getMe(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userService.getById(userId);
+
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setCreatedAt(user.getCreatedAt());
+
+        return ResponseEntity.ok(response);
     }
 }
