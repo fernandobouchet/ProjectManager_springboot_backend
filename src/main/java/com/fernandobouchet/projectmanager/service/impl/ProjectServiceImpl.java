@@ -34,10 +34,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProject(Long id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
-
+    public Project getProject(Long userId, Long id) {
+        Project project = getProjectIfOwner(id, userId);
         return project;
     }
 
@@ -49,8 +47,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project updateProjectTitle(Long id, String title) {
-        Project project = getProject(id);
+    public Project updateProjectTitle(Long userId, Long projectId, String title) {
+        Project project = getProjectIfOwner(projectId, userId);
 
         project.setTitle(title);
 
@@ -58,10 +56,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteProject(Long id) {
-        Project project = getProject(id);
+    public void deleteProject(Long userId, Long projectId) {
+        Project project = getProjectIfOwner(projectId, userId);
 
         projectRepository.delete(project);
+    }
+
+    private Project getProjectIfOwner(Long projectId, Long userId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        if(!project.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Access denied: not the owner");
+        }
+
+        return project;
     }
 
 }
