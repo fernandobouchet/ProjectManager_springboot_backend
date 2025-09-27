@@ -1,10 +1,10 @@
 package com.fernandobouchet.projectmanager.service;
 
 import com.fernandobouchet.projectmanager.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface UserService {
     User registerUser(String username, String email, String password);
-    User loginUser(String email, String password);
-    User getByEmail(String email);
+    UserDetails loginUser(String email, String password);
     User getById(Long userId);
 }

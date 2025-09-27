@@ -7,21 +7,17 @@ import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.security.JwtUtil;
 import com.fernandobouchet.projectmanager.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
     }
 
@@ -40,23 +36,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserLoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
+            UserDetails user = userService.loginUser(request.getEmail(),request.getPassword());
 
-            User user = userService.getByEmail(request.getEmail());
-
-            String token = jwtUtil.generateToken(user.getId());
+            String token = jwtUtil.generateToken(user.getUsername());
 
             return ResponseEntity.ok(token);
-
-        } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid login credentials");
-        }
     }
 
     @GetMapping("/me")

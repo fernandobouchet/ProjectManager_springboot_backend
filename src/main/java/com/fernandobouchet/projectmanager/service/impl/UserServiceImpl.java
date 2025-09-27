@@ -2,8 +2,13 @@ package com.fernandobouchet.projectmanager.service.impl;
 
 import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.repository.UserRepository;
+import com.fernandobouchet.projectmanager.security.CustomUserDetailsService;
 import com.fernandobouchet.projectmanager.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +18,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, CustomUserDetailsService customUserDetailsService) {
         this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -39,22 +48,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User loginUser(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User email not found"));
-
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        if(!encoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+    public UserDetails loginUser(String email, String password) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+        }
+        catch (AuthenticationException e) {
+            throw new RuntimeException("Invalid login credentials");
         }
 
-        return user;
-    }
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User email not found"));
 
-    @Override
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return customUserDetailsService.loadUserByUsername(user.getUsername());
     }
 
     @Override
