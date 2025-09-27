@@ -4,9 +4,11 @@ import com.fernandobouchet.projectmanager.dto.UserLoginRequest;
 import com.fernandobouchet.projectmanager.dto.UserRegisterRequest;
 import com.fernandobouchet.projectmanager.dto.UserResponse;
 import com.fernandobouchet.projectmanager.model.User;
+import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.security.JwtUtil;
 import com.fernandobouchet.projectmanager.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,9 +46,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMe(@RequestHeader("Authorization") String authHeader) {
-        Long userId = jwtUtil.getUserIdFromHeader(authHeader);
-        User user = userService.getById(userId);
+    public ResponseEntity<UserResponse> getMe(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
 
         UserResponse response = new UserResponse();
         response.setId(user.getId());

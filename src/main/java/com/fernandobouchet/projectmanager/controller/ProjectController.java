@@ -4,10 +4,11 @@ import com.fernandobouchet.projectmanager.dto.ProjectCreateRequest;
 import com.fernandobouchet.projectmanager.dto.ProjectResponse;
 import com.fernandobouchet.projectmanager.dto.ProjectUpdateRequest;
 import com.fernandobouchet.projectmanager.model.Project;
-import com.fernandobouchet.projectmanager.security.JwtUtil;
+import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,20 +17,14 @@ import java.util.List;
 @RequestMapping("/projects")
 public class ProjectController {
     private final ProjectService projectService;
-    private final JwtUtil jwtUtil;
 
-    public ProjectController(ProjectService projectService, JwtUtil jwtUtil) {
+    public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
-        this.jwtUtil = jwtUtil;
-    }
-
-    private Long extractUserId(String authHeader) {
-        return jwtUtil.getUserIdFromHeader(authHeader);
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(@RequestHeader("Authorization") String authHeader, @RequestBody ProjectCreateRequest request) {
-        Long userId = extractUserId(authHeader);
+    public ResponseEntity<ProjectResponse> createProject(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ProjectCreateRequest request) {
+        Long userId = customUserDetails.getId();
 
         Project project = projectService.createProject(userId, request.getTitle());
 
@@ -37,8 +32,8 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectResponse> getProjectById(@RequestHeader("Authorization") String authHeader, @PathVariable("projectId") Long projectId) {
-        Long userId = extractUserId(authHeader);
+    public ResponseEntity<ProjectResponse> getProjectById(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("projectId") Long projectId) {
+        Long userId = customUserDetails.getId();
 
         Project project = projectService.getProject(userId, projectId);
 
@@ -46,8 +41,8 @@ public class ProjectController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProjectResponse>> getProjectByUserId(@RequestHeader("Authorization") String authHeader) {
-        Long userId = extractUserId(authHeader);
+    public ResponseEntity<List<ProjectResponse>> getProjectByUserId(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getId();
 
         List<Project> projects = projectService.listProjectsByUser(userId);
 
@@ -55,8 +50,8 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<ProjectResponse> updateProjectTitle(@RequestHeader("Authorization") String authHeader, @PathVariable("projectId") Long projectId, @RequestBody ProjectUpdateRequest request) {
-        Long userId = extractUserId(authHeader);
+    public ResponseEntity<ProjectResponse> updateProjectTitle(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("projectId") Long projectId, @RequestBody ProjectUpdateRequest request) {
+        Long userId = customUserDetails.getId();
 
         Project project = projectService.updateProjectTitle(userId, projectId, request.getTitle());
 
@@ -65,8 +60,8 @@ public class ProjectController {
 
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<Void> deleteProject(@RequestHeader("Authorization") String authHeader, @PathVariable("projectId") Long projectId) {
-        Long userId = extractUserId(authHeader);
+    public ResponseEntity<Void> deleteProject(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("projectId") Long projectId) {
+        Long userId = customUserDetails.getId();
 
         projectService.deleteProject(userId, projectId);
 
