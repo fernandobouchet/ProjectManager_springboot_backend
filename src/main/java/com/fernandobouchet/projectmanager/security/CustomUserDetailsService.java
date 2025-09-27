@@ -2,13 +2,10 @@ package com.fernandobouchet.projectmanager.security;
 
 import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.repository.UserRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,16 +15,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username" + username));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority("USER"))
-        );
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email " + email));
+
+        return new CustomUserDetails(user);
     }
 }
