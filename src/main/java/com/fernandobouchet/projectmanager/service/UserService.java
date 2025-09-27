@@ -6,5 +6,4 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface UserService {
     User registerUser(String username, String email, String password);
     UserDetails loginUser(String email, String password);
-    User getById(Long userId);
 }

@@ -2,9 +2,9 @@ package com.fernandobouchet.projectmanager.service.impl;
 
 import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.repository.UserRepository;
+import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.security.CustomUserDetailsService;
 import com.fernandobouchet.projectmanager.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -58,14 +58,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Invalid login credentials");
         }
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User email not found"));
-
-        return customUserDetailsService.loadUserByUsername(user.getUsername());
-    }
-
-    @Override
-    public User getById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return customUserDetailsService.loadUserByUsername(email);
     }
 }
