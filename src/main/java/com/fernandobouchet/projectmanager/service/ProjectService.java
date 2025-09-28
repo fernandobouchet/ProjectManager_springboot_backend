@@ -10,4 +10,6 @@ public interface ProjectService {
     List<Project> listProjectsByUser(Long userId);
     Project updateProjectTitle(Long userId, Long projectId, String title);
     void deleteProject(Long userId, Long projectId);
+    Project getProjectIfOwner(Long userId, Long projectId);
+    void updateProjectProgress(Project project);
 }

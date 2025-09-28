@@ -36,7 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getProject(Long userId, Long id) {
-        return getProjectIfOwner(id, userId);
+        return getProjectIfOwner(userId, id);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project updateProjectTitle(Long userId, Long projectId, String title) {
-        Project project = getProjectIfOwner(projectId, userId);
+        Project project = getProjectIfOwner(userId, projectId);
 
         project.setTitle(title);
 
@@ -55,14 +55,20 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(Long userId, Long projectId) {
-        Project project = getProjectIfOwner(projectId, userId);
+        Project project = getProjectIfOwner(userId, projectId);
 
         projectRepository.delete(project);
     }
 
-    private Project getProjectIfOwner(Long projectId, Long userId) {
+    @Override
+    public Project getProjectIfOwner(Long userId, Long projectId) {
         return projectRepository.findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new UnauthorizedException("User is not authorized to access the project."));
     }
 
+    @Override
+    public void updateProjectProgress(Project project) {
+        project.updateProgress();
+        projectRepository.save(project);
+    }
 }

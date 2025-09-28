@@ -3,22 +3,17 @@ package com.fernandobouchet.projectmanager.dto;
 import com.fernandobouchet.projectmanager.model.Priority;
 import com.fernandobouchet.projectmanager.model.Status;
 import com.fernandobouchet.projectmanager.model.Task;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class TaskUpdateRequest {
 
-    @NotBlank(message = "Project title is mandatory")
     private String title;
 
-    @NotBlank(message = "Project content is mandatory")
     @Size(max = 500, message = "Content cannot exceed 500 characters")
     private String content;
 
-    @NotBlank(message = "Project status is mandatory")
     private Status status;
 
-    @NotBlank(message = "Project priority is mandatory")
     private Priority priority;
 
     public TaskUpdateRequest() {
@@ -56,13 +51,18 @@ public class TaskUpdateRequest {
         this.priority = priority;
     }
 
-    public Task toEntity() {
-        Task task = new Task();
-        task.setTitle(this.title);
-        task.setContent(this.content);
-        task.setStatus(this.status);
-        task.setPriority(this.priority);
-
-        return task;
+    public void applyToEntity(Task task) {
+        if (this.title != null && !this.title.equals(task.getTitle())) {
+            task.setTitle(this.title);
+        }
+        if (this.content != null && !this.content.equals(task.getContent())) {
+            task.setContent(this.content);
+        }
+        if (this.status != null && !this.status.equals(task.getStatus())) {
+            task.setStatus(this.status);
+        }
+        if (this.priority != null && !this.priority.equals(task.getPriority())) {
+            task.setPriority(this.priority);
+        }
     }
 }

@@ -1,9 +1,9 @@
 package com.fernandobouchet.projectmanager.service.impl;
 
+import com.fernandobouchet.projectmanager.dto.TaskUpdateRequest;
 import com.fernandobouchet.projectmanager.model.*;
-import com.fernandobouchet.projectmanager.repository.ProjectRepository;
 import com.fernandobouchet.projectmanager.repository.TaskRepository;
-import com.fernandobouchet.projectmanager.repository.UserRepository;
+import com.fernandobouchet.projectmanager.service.ProjectService;
 import com.fernandobouchet.projectmanager.service.TaskService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -13,77 +13,60 @@ import java.util.List;
 @Service
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
-    private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
 
-    public TaskServiceImpl(TaskRepository taskRepository, ProjectRepository projectRepository, UserRepository userRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, ProjectService projectService) {
         this.taskRepository = taskRepository;
-        this.projectRepository = projectRepository;
+        this.projectService = projectService;
     }
 
     @Override
-    public Task createTask(Long projectId, String title, String content) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+    public Task createTask(Long userId, Long projectId, String title, String content) {
+        Project project = projectService.getProjectIfOwner(userId, projectId);
 
-            Task task = new Task();
-            task.setTitle(title);
-            task.setContent(content);
-            task.setProject(project);
+        Task task = new Task();
+        task.setTitle(title);
+        task.setContent(content);
+        task.setProject(project);
 
-            taskRepository.save(task);
+        taskRepository.save(task);
 
-            return task;
+        return task;
 
     }
 
     @Override
-    public Task updateTask(Long taskId, Task task) {
-        Task taskToUpdate = getTaskById(taskId);
+    public Task updateTask(Long userId, Long taskId, TaskUpdateRequest requestDto) {
+        Task task = getTaskById(userId, taskId);
 
-        if (task.getTitle() != null && !task.getTitle().equals(taskToUpdate.getTitle())) {
-            taskToUpdate.setTitle(task.getTitle());
-        }
-        if (task.getContent() != null && !task.getContent().equals(taskToUpdate.getContent())) {
-            taskToUpdate.setContent(task.getContent());
-        }
-        if (task.getStatus() != null && !task.getStatus().equals(taskToUpdate.getStatus())) {
-            taskToUpdate.setStatus(task.getStatus());
-        }
-        if (task.getPriority() != null && !task.getPriority().equals(taskToUpdate.getPriority())) {
-            taskToUpdate.setPriority(task.getPriority());
-        }
+        requestDto.applyToEntity(task);
 
-        taskRepository.save(taskToUpdate);
+        taskRepository.save(task);
 
-        Project project = taskToUpdate.getProject();
-        project.updateProgress();
-        projectRepository.save(project);
-
-        return taskToUpdate;
+        projectService.updateProjectProgress(task.getProject());
+        return task;
     }
 
 
     @Override
-    public List<Task> listTasksByProject(Long projectId) {
-        List<Task> tasks = taskRepository.findAllByProjectId(projectId);
-        return tasks;
+    public List<Task> listTasksByProject(Long userId, Long projectId) {
+        projectService.getProjectIfOwner(userId, projectId);
+        return taskRepository.findAllByProjectId(projectId);
     }
 
     @Override
-    public Task getTaskById(Long taskId) {
+    public Task getTaskById(Long userId, Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found."));
 
+        projectService.getProjectIfOwner(userId, task.getProject().getId());
         return task;
     }
 
     @Override
-    public void deleteTask(Long taskId) {
-        Task task = getTaskById(taskId);
+    public void deleteTask(Long userId, Long taskId) {
+        Task task = getTaskById(userId, taskId);
         taskRepository.delete(task);
-
-        Project project = task.getProject();
-        project.updateProgress();
-        projectRepository.save(project);
+        projectService.updateProjectProgress(task.getProject());
     }
 }
