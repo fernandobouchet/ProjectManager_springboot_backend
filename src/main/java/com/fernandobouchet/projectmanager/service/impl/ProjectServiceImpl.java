@@ -1,5 +1,6 @@
 package com.fernandobouchet.projectmanager.service.impl;
 
+import com.fernandobouchet.projectmanager.exception.UnauthorizedException;
 import com.fernandobouchet.projectmanager.model.Project;
 import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.repository.ProjectRepository;
@@ -35,15 +36,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getProject(Long userId, Long id) {
-        Project project = getProjectIfOwner(id, userId);
-        return project;
+        return getProjectIfOwner(id, userId);
     }
 
     @Override
     public List<Project> listProjectsByUser(Long userId) {
-        List<Project> projects = projectRepository.findAllByUserId(userId);
-
-        return projects;
+        return projectRepository.findAllByUserId(userId);
     }
 
     @Override
@@ -63,14 +61,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private Project getProjectIfOwner(Long projectId, Long userId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
-
-        if(!project.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Access denied: not the owner");
-        }
-
-        return project;
+        return projectRepository.findByIdAndUserId(projectId, userId)
+                .orElseThrow(() -> new UnauthorizedException("User is not authorized to access the project."));
     }
 
 }
