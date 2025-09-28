@@ -11,6 +11,8 @@ public class ProjectResponse {
     private Double progress;
     private Date createdAt;
     private Date updatedAt;
+    private List<TaskResponse> tasks;
+
 
     public ProjectResponse() {
     }
@@ -55,6 +57,14 @@ public class ProjectResponse {
         this.updatedAt = updatedAt;
     }
 
+    public List<TaskResponse> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<TaskResponse> tasks) {
+        this.tasks = tasks;
+    }
+
     public static ProjectResponse fromEntity(Project project) {
         ProjectResponse dto = new ProjectResponse();
         dto.setId(project.getId());
@@ -62,6 +72,9 @@ public class ProjectResponse {
         dto.setProgress(project.getProgress());
         dto.setCreatedAt(project.getCreatedAt());
         dto.setUpdatedAt(project.getUpdatedAt());
+        if(project.getTasks() != null) {
+            dto.setTasks(TaskResponse.fromEntities(project.getTasks()));
+        }
         return dto;
     }
 
