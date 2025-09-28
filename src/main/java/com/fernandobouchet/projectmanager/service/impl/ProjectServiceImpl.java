@@ -6,6 +6,7 @@ import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.repository.ProjectRepository;
 import com.fernandobouchet.projectmanager.repository.UserRepository;
 import com.fernandobouchet.projectmanager.service.ProjectService;
+import com.fernandobouchet.projectmanager.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -14,18 +15,16 @@ import java.util.List;
 @Service
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService) {
         this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
     public Project createProject(Long userId, String title) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+        User user = userService.findById(userId);
 
         Project project = new Project();
         project.setTitle(title);

@@ -5,6 +5,7 @@ import com.fernandobouchet.projectmanager.repository.UserRepository;
 import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.security.CustomUserDetailsService;
 import com.fernandobouchet.projectmanager.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -59,5 +60,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return customUserDetailsService.loadUserByUsername(email);
+    }
+
+    @Override
+    public User findById(Long userId) {
+        return  userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }
