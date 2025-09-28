@@ -3,6 +3,7 @@ package com.fernandobouchet.projectmanager.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -51,16 +52,10 @@ public class JwtUtil {
     }
 
     private Claims parseClaims(String token) {
-        try {
-            return  Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("JWT token expired", e);
-        } catch (JwtException e) {
-            throw new RuntimeException("Invalid JWT token", e);
-        }
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
