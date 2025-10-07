@@ -3,7 +3,6 @@ package com.fernandobouchet.projectmanager.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -43,8 +42,12 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token, String username) {
-        String tokenUsername = extractUsername(token);
-        return (tokenUsername.equals(username) && !isTokenExpired(token));
+        try {
+            String tokenUsername = extractUsername(token);
+            return username.equals(tokenUsername) && !isTokenExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
