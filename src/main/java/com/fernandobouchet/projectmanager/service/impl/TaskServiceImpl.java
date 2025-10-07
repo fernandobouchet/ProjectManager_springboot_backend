@@ -7,6 +7,7 @@ import com.fernandobouchet.projectmanager.service.ProjectService;
 import com.fernandobouchet.projectmanager.service.TaskService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class TaskServiceImpl implements TaskService {
         this.projectService = projectService;
     }
 
+    @Transactional
     @Override
     public Task createTask(Long userId, Long projectId, String title, String content) {
         Project project = projectService.getProjectIfOwner(userId, projectId);
@@ -35,6 +37,7 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    @Transactional
     @Override
     public Task updateTask(Long userId, Long taskId, TaskUpdateRequest requestDto) {
         Task task = getTaskById(userId, taskId);
@@ -47,13 +50,14 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public List<Task> listTasksByProject(Long userId, Long projectId) {
         projectService.getProjectIfOwner(userId, projectId);
         return taskRepository.findAllByProjectId(projectId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Task getTaskById(Long userId, Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -63,6 +67,7 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
+    @Transactional
     @Override
     public void deleteTask(Long userId, Long taskId) {
         Task task = getTaskById(userId, taskId);

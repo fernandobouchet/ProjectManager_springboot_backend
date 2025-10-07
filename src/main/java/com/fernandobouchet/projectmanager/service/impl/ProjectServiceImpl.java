@@ -9,6 +9,7 @@ import com.fernandobouchet.projectmanager.service.ProjectService;
 import com.fernandobouchet.projectmanager.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.userService = userService;
     }
 
+    @Transactional
     @Override
     public Project createProject(Long userId, String title) {
         User user = userService.findById(userId);
@@ -33,16 +35,19 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Project getProject(Long userId, Long id) {
         return getProjectIfOwner(userId, id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Project> listProjectsByUser(Long userId) {
         return projectRepository.findAllByUserId(userId);
     }
 
+    @Transactional
     @Override
     public Project updateProjectTitle(Long userId, Long projectId, String title) {
         Project project = getProjectIfOwner(userId, projectId);
@@ -52,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional
     @Override
     public void deleteProject(Long userId, Long projectId) {
         Project project = getProjectIfOwner(userId, projectId);
@@ -59,12 +65,14 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.delete(project);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Project getProjectIfOwner(Long userId, Long projectId) {
         return projectRepository.findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new UnauthorizedException("User is not authorized to access the project."));
     }
 
+    @Transactional
     @Override
     public void updateProjectProgress(Project project) {
         project.updateProgress();

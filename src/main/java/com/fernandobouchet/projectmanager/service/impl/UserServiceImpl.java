@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @Override
     public User registerUser(String username, String email, String password) {
         userRepository.findByEmail(email).ifPresent(user -> {
@@ -59,6 +61,7 @@ public class UserServiceImpl implements UserService {
         return customUserDetailsService.loadUserByUsername(email);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User findById(Long userId) {
         return userRepository.findById(userId)
