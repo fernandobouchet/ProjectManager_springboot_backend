@@ -7,6 +7,7 @@ import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.security.JwtUtil;
 import com.fernandobouchet.projectmanager.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +34,7 @@ public class AuthController {
         response.setEmail(user.getEmail());
         response.setCreatedAt(user.getCreatedAt());
 
-       return ResponseEntity.ok(response);
+       return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
