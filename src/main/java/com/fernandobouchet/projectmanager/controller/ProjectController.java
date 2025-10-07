@@ -6,6 +6,7 @@ import com.fernandobouchet.projectmanager.dto.ProjectUpdateRequest;
 import com.fernandobouchet.projectmanager.model.Project;
 import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.service.ProjectService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ProjectCreateRequest request) {
+    public ResponseEntity<ProjectResponse> createProject(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody ProjectCreateRequest request) {
         Long userId = customUserDetails.getId();
 
         Project project = projectService.createProject(userId, request.getTitle());
@@ -50,7 +51,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<ProjectResponse> updateProjectTitle(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("projectId") Long projectId, @RequestBody ProjectUpdateRequest request) {
+    public ResponseEntity<ProjectResponse> updateProjectTitle(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("projectId") Long projectId, @Valid @RequestBody ProjectUpdateRequest request) {
         Long userId = customUserDetails.getId();
 
         Project project = projectService.updateProjectTitle(userId, projectId, request.getTitle());

@@ -7,6 +7,7 @@ import com.fernandobouchet.projectmanager.model.User;
 import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.security.JwtUtil;
 import com.fernandobouchet.projectmanager.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
         User user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 
         UserResponse response = new UserResponse();
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<String> loginUser(@Valid @RequestBody UserLoginRequest request) {
             UserDetails user = userService.loginUser(request.getEmail(),request.getPassword());
 
             String token = jwtUtil.generateToken(user.getUsername());

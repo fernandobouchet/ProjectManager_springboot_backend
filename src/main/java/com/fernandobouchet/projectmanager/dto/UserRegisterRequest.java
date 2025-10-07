@@ -2,6 +2,7 @@ package com.fernandobouchet.projectmanager.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserRegisterRequest {
@@ -15,7 +16,8 @@ public class UserRegisterRequest {
     private String email;
 
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, message = "Password must have at least 6 characters")
+    @Size(min = 6, max = 50, message = "Password must be between 6 and 50 characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{6,50}$", message = "Password must contain letters and numbers")
     private String password;
 
     public UserRegisterRequest() {

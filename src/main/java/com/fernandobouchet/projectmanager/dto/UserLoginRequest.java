@@ -11,6 +11,7 @@ public class UserLoginRequest {
     private String email;
 
     @NotBlank(message = "Password is mandatory")
+    @Size(min = 6, max = 50, message = "Password must be between 6 and 50 characters")
     private String password;
 
     public UserLoginRequest() {

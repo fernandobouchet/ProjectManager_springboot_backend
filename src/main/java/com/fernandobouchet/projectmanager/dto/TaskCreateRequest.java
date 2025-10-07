@@ -2,16 +2,18 @@ package com.fernandobouchet.projectmanager.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class TaskCreateRequest {
 
     @NotNull(message = "Project ID is mandatory")
     private Long projectId;
 
-    @NotBlank(message = "Project title is mandatory")
+    @NotBlank(message = "Task title is mandatory")
     private String title;
 
-    @NotBlank(message = "Project content is mandatory")
+    @NotBlank(message = "Task content is mandatory")
+    @Size(max = 500, message = "Content cannot exceed 500 characters")
     private String content;
 
     public TaskCreateRequest() {

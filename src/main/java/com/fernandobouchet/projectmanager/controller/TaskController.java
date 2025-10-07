@@ -6,6 +6,7 @@ import com.fernandobouchet.projectmanager.dto.TaskUpdateRequest;
 import com.fernandobouchet.projectmanager.model.Task;
 import com.fernandobouchet.projectmanager.security.CustomUserDetails;
 import com.fernandobouchet.projectmanager.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody TaskCreateRequest request) {
+    public ResponseEntity<TaskResponse> createTask(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody TaskCreateRequest request) {
         Long userId = customUserDetails.getId();
         Task task = taskService.createTask(userId, request.getProjectId(), request.getTitle(), request.getContent());
 
@@ -46,7 +47,7 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<TaskResponse> updateTask(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long taskId, @RequestBody TaskUpdateRequest request) {
+    public ResponseEntity<TaskResponse> updateTask(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long taskId, @Valid @RequestBody TaskUpdateRequest request) {
         Long userId = customUserDetails.getId();
 
         Task updatedTask = taskService.updateTask(userId, taskId, request);
